@@ -109,6 +109,14 @@ sudo systemctl reload nginx
 
 The Compose port is intentionally bound to `127.0.0.1`, so host Nginx can reach it locally while the app port and MySQL are not exposed directly to the network.
 
+#### Cover photo upload limits
+
+Cover and inline images are limited by Laravel to 5 MB. The PHP-FPM image allows individual uploads up to 6 MB and whole multipart requests up to 8 MB. Keep `client_max_body_size 8m;` in both the Docker Nginx configuration and the host Nginx reverse-proxy `server` block. If you change these limits, keep the proxy, PHP, and Laravel limits consistent. After changing the PHP settings in `docker/php/uploads.ini`, rebuild the app image:
+
+```bash
+docker compose up -d --build app
+```
+
 Useful operations:
 
 ```bash

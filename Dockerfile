@@ -1,5 +1,7 @@
 FROM php:8.4-fpm-bookworm AS php-base
 
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libicu-dev libzip-dev \
     && docker-php-ext-install -j"$(nproc)" bcmath intl opcache pdo_mysql zip \
