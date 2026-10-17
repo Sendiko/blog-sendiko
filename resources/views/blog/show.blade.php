@@ -57,7 +57,7 @@
                 @else
                     <a href="{{ route('login') }}">Writer login</a>
                 @endif
-                <a href="mailto:hello@sendiko.com">Email me ↗</a>
+                <a href="mailto:rizky@sendiko.dev">Email me ↗</a>
             </div>
             <span class="copyright">© {{ date('Y') }} Sendiko</span>
         </footer>

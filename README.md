@@ -28,6 +28,8 @@ docker compose run --rm --user www-data app php artisan migrate --force
 docker compose run --rm --user www-data app php artisan db:seed --force
 ```
 
+The homepage hero and site favicon use `storage/app/public/hero_image.jpg` and `storage/app/public/favicon.jpg`. These files are included in the Docker image; the app container copies them into the persistent storage volume when it starts, so existing volumes receive the assets too. To replace either image, update the corresponding file and deploy with `docker compose up -d --build`. For a non-Docker deployment, make sure `php artisan storage:link` has been run.
+
 The Nginx container listens on `127.0.0.1:8080` by default. If you use a host Nginx reverse proxy, set `APP_PORT=3014` in `.env` to match the example below. Confirm the site locally on the server:
 
 ```bash

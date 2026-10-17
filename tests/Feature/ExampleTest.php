@@ -7,6 +7,8 @@ test('returns a successful response', function () {
 
     $response->assertOk()
         ->assertSee('Ideas for a')
+        ->assertSee('/storage/hero_image.jpg')
+        ->assertSee('/storage/favicon.jpg')
         ->assertSee('Recent')
         ->assertSee('A note, now');
 });

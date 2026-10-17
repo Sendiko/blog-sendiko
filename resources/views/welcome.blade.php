@@ -6,8 +6,7 @@
         <meta name="description" content="Notes on creative work, the internet, and finding a little more meaning in the everyday.">
         <title>Sendiko — Notes from the in-between</title>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="{{ asset('storage/favicon.jpg') }}" type="image/jpeg">
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -32,14 +31,10 @@
                         <p class="intro__description">I'm Sendiko — a curious human writing about creative work, the internet, and the small things that make a life.</p>
                         <a class="text-link" href="#latest">Come on in <span aria-hidden="true">↓</span></a>
                     </div>
-                    <div class="intro__art" role="img" aria-label="Sunlight falling across a quiet, leafy landscape">
+                    <div class="intro__art" role="img" aria-label="Landscape photograph featured on the Sendiko homepage">
+                        <img class="intro__image" src="{{ asset('storage/hero_image.jpg') }}" alt="" fetchpriority="high">
                         <div class="art-note art-note--top">FIELD NOTES <span>NO. 01</span></div>
                         <div class="art-note art-note--bottom">SOMEWHERE, SLOWING DOWN</div>
-                        <span class="art-sun"></span>
-                        <span class="art-hill art-hill--back"></span>
-                        <span class="art-hill art-hill--front"></span>
-                        <span class="art-stem art-stem--one"></span>
-                        <span class="art-stem art-stem--two"></span>
                     </div>
                 </div>
                 <div class="intro-footer">
@@ -150,7 +145,7 @@
                 @else
                     <a href="{{ route('login') }}">Writer login</a>
                 @endif
-                <a href="mailto:hello@sendiko.com">Email me <span aria-hidden="true">↗</span></a>
+                <a href="mailto:rizky@sendiko.dev">Email me <span aria-hidden="true">↗</span></a>
             </div>
             <span class="copyright">© {{ date('Y') }} Sendiko</span>
         </footer>

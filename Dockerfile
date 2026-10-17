@@ -25,6 +25,8 @@ RUN composer install \
 COPY . .
 
 RUN composer dump-autoload --no-dev --optimize --no-scripts
+RUN mkdir -p /opt/sendiko-branding \
+    && cp storage/app/public/favicon.jpg storage/app/public/hero_image.jpg /opt/sendiko-branding/
 
 FROM node:22-bookworm-slim AS assets
 
@@ -46,6 +48,8 @@ WORKDIR /var/www/html
 
 COPY --from=vendor --chown=www-data:www-data /var/www/html /var/www/html
 COPY --from=assets --chown=www-data:www-data /var/www/html/public/build /var/www/html/public/build
+COPY --from=vendor /opt/sendiko-branding /opt/sendiko-branding
+COPY --chmod=755 docker/app-entrypoint.sh /usr/local/bin/sendiko-entrypoint
 
 RUN mkdir -p storage/framework/cache/data storage/framework/sessions \
     storage/framework/views storage/logs bootstrap/cache \
@@ -53,6 +57,7 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions \
     && php artisan package:discover --ansi \
     && php artisan storage:link
 
+ENTRYPOINT ["/usr/local/bin/sendiko-entrypoint"]
 EXPOSE 9000
 
 CMD ["php-fpm"]
