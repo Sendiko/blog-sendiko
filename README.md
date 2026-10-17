@@ -28,13 +28,86 @@ docker compose run --rm --user www-data app php artisan migrate --force
 docker compose run --rm --user www-data app php artisan db:seed --force
 ```
 
-The Nginx container listens on `127.0.0.1:8080` by default. Confirm the site locally on the server:
+The Nginx container listens on `127.0.0.1:8080` by default. If you use a host Nginx reverse proxy, set `APP_PORT=3014` in `.env` to match the example below. Confirm the site locally on the server:
 
 ```bash
+docker compose ps
 curl --fail http://127.0.0.1:8080/
 ```
 
-For a public site, keep this port bound to loopback and put a TLS-enabled reverse proxy (such as host Nginx, Caddy, or a managed proxy) in front of it. Proxy to `127.0.0.1:8080`, configure HTTPS, and set `APP_URL` to the public HTTPS URL in `.env`. Set `APP_PORT` if another local port is needed. Do not expose the MySQL service publicly; it is only available on the private Compose network.
+For a public site, keep this port bound to loopback and put a TLS-enabled reverse proxy (such as host Nginx, Caddy, or a managed proxy) in front of it. Proxy to `127.0.0.1:8080`, configure HTTPS, and set `APP_URL` to the public HTTPS URL in `.env`. Set `APP_PORT` if another local port is needed. If you change it, use the new port in the local `curl` command. Do not expose the MySQL service publicly; it is only available on the private Compose network.
+
+If the page loads without its CSS over HTTPS, inspect the rendered page source for the `build/assets/*.css` URLs. They must start with `https://` (or be root-relative URLs), not `http://`. Set `APP_URL` to the site's exact public HTTPS origin, such as `https://blog.sendiko.dev`. Laravel must also trust the HTTPS scheme forwarded by the TLS-terminating host Nginx. This project trusts the forwarded protocol header, and its internal Nginx passes that header to PHP-FPM. Rebuild and recreate both containers to deploy these changes:
+
+```bash
+docker compose up -d --build --force-recreate app web
+docker compose exec --user www-data app php artisan optimize:clear
+docker compose exec --user www-data app php artisan optimize
+```
+
+Check the page source again after the containers restart. Keep the host Nginx `proxy_set_header X-Forwarded-Proto $scheme;` directive. The Compose environment passes `APP_URL` to Laravel; a wrong `http://` value or an untrusted forwarded protocol can make Laravel generate HTTP asset links that browsers block as mixed content on an HTTPS page.
+
+### Host Nginx reverse proxy with Certbot
+
+For the domains `www.sendiko.my.id` and `www.sendiko.dev`, set the matching port and canonical URL in the Compose `.env` file:
+
+```dotenv
+APP_PORT=3014
+APP_URL=https://www.sendiko.dev
+```
+
+Apply the port change and verify the local upstream before reloading host Nginx:
+
+```bash
+docker compose up -d
+docker compose ps
+curl --fail http://127.0.0.1:3014/
+```
+
+Use this as `/etc/nginx/sites-available/sendiko`, replacing the existing proxy configuration. The TLS certificate must cover **both** hostnames because TLS negotiation happens before Nginx can redirect either hostname:
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.sendiko.my.id www.sendiko.dev;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name www.sendiko.my.id www.sendiko.dev;
+
+    ssl_certificate /etc/letsencrypt/live/www.sendiko.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www.sendiko.dev/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    client_max_body_size 8m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3014;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+}
+```
+
+If the current Certbot certificate does not include both names, inspect it with `sudo certbot certificates` and issue/expand a certificate for both `www.sendiko.dev` and `www.sendiko.my.id` before enabling the HTTPS server block. Keep the certificate paths consistent with the actual certificate name Certbot reports.
+
+On Fedora, Nginx normally loads `/etc/nginx/conf.d/*.conf`; it does not automatically load `sites-available`. If you keep the file at `/etc/nginx/sites-available/sendiko`, make sure your main Nginx configuration includes an enabled file from `sites-enabled`, or put the server block in `/etc/nginx/conf.d/sendiko.conf` instead. Check which files Nginx loads with `sudo nginx -T`, then validate and reload:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+The Compose port is intentionally bound to `127.0.0.1`, so host Nginx can reach it locally while the app port and MySQL are not exposed directly to the network.
 
 Useful operations:
 
@@ -45,6 +118,26 @@ docker compose down
 ```
 
 `docker compose down` preserves the database and uploads. Do not use `docker compose down -v` unless intentionally deleting both persistent volumes. To deploy code changes, pull the new source and run `docker compose up -d --build`; then run `docker compose run --rm --user www-data app php artisan migrate --force`. Back up the `mysql_data` and `app_storage` volumes before upgrades.
+
+### Troubleshooting: HTTP 500 with an empty `APP_KEY`
+
+Laravel needs a persistent application key to encrypt sessions and cookies. If `APP_KEY` was left empty, generate a key and set it in the host `.env` file:
+
+```bash
+docker compose run --rm --no-deps app php artisan key:generate --show
+```
+
+Copy the printed `base64:...` value into `APP_KEY` in `.env`, then recreate the application container so it receives the new value:
+
+```bash
+docker compose up -d --force-recreate app
+```
+
+Keep the same key for future deployments. Changing it later invalidates existing encrypted sessions and cookies. If the site still returns 500, check `docker compose logs --tail=100 app` and, with `APP_DEBUG=false`, inspect the Laravel log inside the running container:
+
+```bash
+docker compose exec --user www-data app tail -n 100 storage/logs/laravel.log
+```
 
 ## Requirements
 
