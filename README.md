@@ -4,7 +4,7 @@ A Laravel blog with public article pages and an authenticated writing dashboard.
 
 ## Run with Docker Compose and MySQL
 
-Docker Compose runs the Laravel app with PHP-FPM, an Nginx frontend, and MySQL 8.4. The MySQL database and uploaded images are stored in named volumes.
+Docker Compose runs the Laravel app with PHP 8.4-FPM, an Nginx frontend, and MySQL 8.4. PHP 8.4 is needed by the Symfony versions currently locked in `composer.lock`. The MySQL database and uploaded images are stored in named volumes.
 
 Install Docker Engine and the Docker Compose plugin on your Linux server. Create the Compose environment file:
 

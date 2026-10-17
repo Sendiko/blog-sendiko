@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-bookworm AS php-base
+FROM php:8.4-fpm-bookworm AS php-base
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libicu-dev libzip-dev \
