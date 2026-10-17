@@ -2,6 +2,50 @@
 
 A Laravel blog with public article pages and an authenticated writing dashboard. Articles support Markdown, cover photos, and inline image uploads.
 
+## Run with Docker Compose and MySQL
+
+Docker Compose runs the Laravel app with PHP-FPM, an Nginx frontend, and MySQL 8.4. The MySQL database and uploaded images are stored in named volumes.
+
+Install Docker Engine and the Docker Compose plugin on your Linux server. Create the Compose environment file:
+
+```bash
+cp .env.docker.example .env
+chmod 600 .env
+```
+
+Edit `.env` and set a unique admin email, admin password (at least 12 characters), MySQL application password, and MySQL root password. Use independently generated strong secrets for `DB_PASSWORD` and `MYSQL_ROOT_PASSWORD`. Keep the file private; Compose loads these values into the application and database containers. Get an initial Laravel application key without persisting an empty key:
+
+```bash
+docker compose build
+docker compose run --rm --user www-data app php artisan key:generate --show
+```
+
+Copy the printed `base64:...` value into `APP_KEY` in `.env`. Do not share or commit the key. Start MySQL and the app, apply migrations, and create the configured writer account:
+
+```bash
+docker compose up -d --build
+docker compose run --rm --user www-data app php artisan migrate --force
+docker compose run --rm --user www-data app php artisan db:seed --force
+```
+
+The Nginx container listens on `127.0.0.1:8080` by default. Confirm the site locally on the server:
+
+```bash
+curl --fail http://127.0.0.1:8080/
+```
+
+For a public site, keep this port bound to loopback and put a TLS-enabled reverse proxy (such as host Nginx, Caddy, or a managed proxy) in front of it. Proxy to `127.0.0.1:8080`, configure HTTPS, and set `APP_URL` to the public HTTPS URL in `.env`. Set `APP_PORT` if another local port is needed. Do not expose the MySQL service publicly; it is only available on the private Compose network.
+
+Useful operations:
+
+```bash
+docker compose logs -f app web db
+docker compose exec --user www-data app php artisan optimize
+docker compose down
+```
+
+`docker compose down` preserves the database and uploads. Do not use `docker compose down -v` unless intentionally deleting both persistent volumes. To deploy code changes, pull the new source and run `docker compose up -d --build`; then run `docker compose run --rm --user www-data app php artisan migrate --force`. Back up the `mysql_data` and `app_storage` volumes before upgrades.
+
 ## Requirements
 
 - Linux server with a domain name pointed to it
