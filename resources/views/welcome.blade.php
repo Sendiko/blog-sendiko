@@ -16,7 +16,7 @@
             <div class="site-header__inner">
                 <a class="wordmark" href="#top" aria-label="Sendiko home">sendiko<span>.</span></a>
                 <nav class="main-nav" aria-label="Main navigation">
-                    <a class="main-nav__link main-nav__link--active" href="#latest">Writing</a>
+                    <a class="main-nav__link main-nav__link--active" href="{{ route('blog.index') }}">Writing</a>
                     <a class="main-nav__link" href="#about">About</a>
                     <a class="main-nav__link" href="#newsletter">Newsletter</a>
                 </nav>
@@ -27,8 +27,7 @@
         <main id="top">
             <section class="intro-wrap">
                 <div class="intro">
-                    <div class="intro__copy">
-                        <p class="eyebrow"><span class="status-dot"></span> A little corner of the internet</p>
+                    <div class="intro__copy" id="about">
                         <h1>Ideas for a<br>life <span>well noticed.</span></h1>
                         <p class="intro__description">I'm Sendiko — a curious human writing about creative work, the internet, and the small things that make a life.</p>
                         <a class="text-link" href="#latest">Come on in <span aria-hidden="true">↓</span></a>
@@ -55,53 +54,59 @@
                         <p class="eyebrow">The journal</p>
                         <h2>Recent <span>dispatches</span></h2>
                     </div>
-                    <a class="text-link section-heading__link" href="#latest">All writing <span aria-hidden="true">↗</span></a>
+                    <a class="text-link section-heading__link" href="{{ route('blog.index') }}">All writing <span aria-hidden="true">↗</span></a>
                 </div>
 
-                <div class="featured-post">
-                    <a class="featured-post__image" href="#newsletter" aria-label="Read The case for making things slowly">
-                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85" alt="Warm, sunlit creative studio with a work table" loading="lazy">
-                        <span class="image-index">01 / THE LONG READ</span>
-                    </a>
-                    <div class="featured-post__content">
-                        <div class="post-meta"><span>CREATIVE PRACTICE</span><span>·</span><time datetime="2025-04-18">APR 18, 2025</time></div>
-                        <h3><a href="#newsletter">The case for making things slowly</a></h3>
-                        <p>Somewhere along the way, faster became the default. A small argument for taking the long route, following the thread, and letting good work take the time it takes.</p>
-                        <div class="post-byline">
-                            <div class="avatar">S</div>
-                            <span>By Sendiko <span class="byline-separator">·</span> 8 min read</span>
-                            <a class="round-arrow" href="#newsletter" aria-label="Read The case for making things slowly">↗</a>
+                @if ($posts->isNotEmpty())
+                    @php($featuredPost = $posts->first())
+                    <div class="featured-post">
+                        <a class="featured-post__image" href="{{ route('blog.show', $featuredPost->slug) }}" aria-label="Read {{ $featuredPost->title }}">
+                            @if ($featuredPost->cover_image)
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($featuredPost->cover_image) }}" alt="{{ $featuredPost->title }}" loading="lazy">
+                            @else
+                                <span class="post-card__placeholder" aria-hidden="true">s.</span>
+                            @endif
+                            <span class="image-index">LATEST DISPATCH</span>
+                        </a>
+                        <div class="featured-post__content">
+                            <div class="post-meta"><span>BY {{ mb_strtoupper($featuredPost->author->name) }}</span><span>·</span><time datetime="{{ $featuredPost->published_at->toDateString() }}">{{ $featuredPost->published_at->format('M d, Y') }}</time></div>
+                            <h3><a href="{{ route('blog.show', $featuredPost->slug) }}">{{ $featuredPost->title }}</a></h3>
+                            <p>{{ $featuredPost->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($featuredPost->body), 180) }}</p>
+                            <div class="post-byline">
+                                <div class="avatar">{{ mb_substr($featuredPost->author->name, 0, 1) }}</div>
+                                <span>By {{ $featuredPost->author->name }} <span class="byline-separator">·</span> A dispatch</span>
+                                <a class="round-arrow" href="{{ route('blog.show', $featuredPost->slug) }}" aria-label="Read {{ $featuredPost->title }}">↗</a>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="post-grid">
-                    <article class="post-card">
-                        <a class="post-card__image post-card__image--blue" href="#newsletter" aria-label="Read A quieter corner of the internet">
-                            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80" alt="Calm, plant-filled workspace by a window" loading="lazy">
-                        </a>
-                        <div class="post-meta"><span>THE INTERNET</span><span>·</span><time datetime="2025-04-02">APR 02, 2025</time></div>
-                        <h3><a href="#newsletter">A quieter corner of the internet</a></h3>
-                        <p>On personal websites, open tabs, and finding your way back to the good stuff.</p>
-                        <span class="read-time">5 MIN READ</span>
-                    </article>
-                    <article class="post-card">
-                        <a class="post-card__image post-card__image--rose" href="#newsletter" aria-label="Read Things I learned from starting over">
-                            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80" alt="Notebook and pen on a sunlit desk" loading="lazy">
-                        </a>
-                        <div class="post-meta"><span>PERSONAL NOTES</span><span>·</span><time datetime="2025-03-21">MAR 21, 2025</time></div>
-                        <h3><a href="#newsletter">Things I learned from starting over</a></h3>
-                        <p>A field guide to being new at something, written by someone still figuring it out.</p>
-                        <span class="read-time">6 MIN READ</span>
-                    </article>
-                    <aside class="about-card" id="about">
-                        <div class="about-card__mark" aria-hidden="true">s.</div>
-                        <p class="eyebrow">A quick hello</p>
-                        <h3>Good to have<br>you <span>here.</span></h3>
-                        <p>This is my little home on the web. I write to think out loud, share what I’m learning, and pay closer attention.</p>
-                        <a class="text-link" href="#newsletter">A bit more about me <span aria-hidden="true">↗</span></a>
-                    </aside>
-                </div>
+                    @if ($posts->count() > 1)
+                        <div class="post-grid">
+                            @foreach ($posts->skip(1) as $post)
+                                <article class="post-card">
+                                    <a class="post-card__image" href="{{ route('blog.show', $post->slug) }}">
+                                        @if ($post->cover_image)
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($post->cover_image) }}" alt="{{ $post->title }}" loading="lazy">
+                                        @else
+                                            <span class="post-card__placeholder" aria-hidden="true">s.</span>
+                                        @endif
+                                    </a>
+                                    <div class="post-meta"><span>{{ mb_strtoupper($post->author->name) }}</span><span>·</span><time datetime="{{ $post->published_at->toDateString() }}">{{ $post->published_at->format('M d, Y') }}</time></div>
+                                    <h3><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                    @if ($post->excerpt)
+                                        <p>{{ $post->excerpt }}</p>
+                                    @endif
+                                    <a class="read-time" href="{{ route('blog.show', $post->slug) }}">READ ARTICLE ↗</a>
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
+                @else
+                    <div class="blog-empty">
+                        <h2>The next story is still being written.</h2>
+                        <p>Check back soon for a new dispatch.</p>
+                    </div>
+                @endif
 
                 <div class="topics">
                     <span class="topics__label">A few things I write about</span>
@@ -138,8 +143,13 @@
             <a class="wordmark" href="#top">sendiko<span>.</span></a>
             <p>Made with curiosity & a cup of tea.</p>
             <div class="footer-links">
-                <a href="#latest">Writing</a>
+                <a href="{{ route('blog.index') }}">Writing</a>
                 <a href="#about">About</a>
+                @if (auth()->check())
+                    <a href="{{ route('dashboard.posts.index') }}">Manage writing</a>
+                @else
+                    <a href="{{ route('login') }}">Writer login</a>
+                @endif
                 <a href="mailto:hello@sendiko.com">Email me <span aria-hidden="true">↗</span></a>
             </div>
             <span class="copyright">© {{ date('Y') }} Sendiko</span>

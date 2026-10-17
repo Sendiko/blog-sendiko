@@ -13,6 +13,9 @@
                 <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                     {{ __('Dashboard') }}
                 </flux:navbar.item>
+                <flux:navbar.item icon="book-open-text" :href="route('dashboard.posts.index')" :current="request()->routeIs('dashboard.posts.*')" wire:navigate>
+                    {{ __('Articles') }}
+                </flux:navbar.item>
             </flux:navbar>
 
             <flux:spacer />
