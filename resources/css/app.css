@@ -120,6 +120,25 @@ select:focus[data-flux-control] {
     @apply h-auto max-w-full rounded-lg;
 }
 
+.markdown-preview table,
+.article-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+    @apply border border-zinc-300 px-3 py-2 text-left align-top dark:border-zinc-700;
+}
+
+.markdown-preview th {
+    @apply bg-zinc-100 font-semibold dark:bg-zinc-800;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
@@ -1016,6 +1035,20 @@ select:focus[data-flux-control] {
 
 .article-content li + li {
     margin-top: 0.35em;
+}
+
+.article-content th,
+.article-content td {
+    padding: 0.65em 0.85em;
+    border: 1px solid #c9c9be;
+    text-align: left;
+    vertical-align: top;
+}
+
+.article-content th {
+    background: #eeede7;
+    color: var(--ink);
+    font-weight: 600;
 }
 
 .article-content img {
