@@ -31,6 +31,8 @@ class BlogController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        $post->recordView();
+
         return view('blog.show', compact('post'));
     }
 }

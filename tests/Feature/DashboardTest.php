@@ -19,13 +19,14 @@ test('the dashboard shows the signed-in authors article counts and recent posts'
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
 
-    $user->posts()->create([
+    $publishedPost = $user->posts()->create([
         'title' => 'Published story',
         'slug' => 'published-story',
         'body' => 'Published content.',
         'status' => 'published',
         'published_at' => now(),
     ]);
+    $publishedPost->forceFill(['views' => 7])->save();
     $user->posts()->create([
         'title' => 'Draft story',
         'slug' => 'draft-story',
@@ -46,6 +47,8 @@ test('the dashboard shows the signed-in authors article counts and recent posts'
         ->assertSee('Total articles')
         ->assertSee('Published')
         ->assertSee('Drafts')
+        ->assertSee('Article views')
+        ->assertSee('7')
         ->assertSee('Published story')
         ->assertSee('Draft story')
         ->assertDontSee('Another authors story')

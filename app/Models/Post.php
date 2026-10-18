@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -18,6 +19,7 @@ use Illuminate\Support\Str;
  * @property string $body
  * @property string|null $cover_image
  * @property string $status
+ * @property int $views
  * @property Carbon|null $published_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -46,6 +48,13 @@ class Post extends Model
     public function renderedBody(): string
     {
         return self::renderMarkdown($this->body);
+    }
+
+    public function recordView(): void
+    {
+        DB::table($this->getTable())
+            ->where($this->getKeyName(), $this->getKey())
+            ->increment('views');
     }
 
     public static function renderMarkdown(string $body): string

@@ -50,8 +50,27 @@ test('published markdown is rendered safely and drafts are not public', function
         ->assertDontSee('<script>alert', false)
         ->assertDontSee('href="javascript:', false);
 
+    expect($published->fresh()->views)->toBe(1);
+
     $this->get(route('blog.show', $draft->slug))->assertNotFound();
     $this->get(route('blog.index'))->assertDontSee('Private Draft');
+});
+
+test('each visit to a published article increments its view count without changing its edit timestamp', function () {
+    $post = User::factory()->create()->posts()->create([
+        'title' => 'A Popular Article',
+        'slug' => 'a-popular-article',
+        'body' => 'Article content.',
+        'status' => 'published',
+        'published_at' => now()->subMinute(),
+    ]);
+    $updatedAt = $post->updated_at;
+
+    $this->get(route('blog.show', $post->slug))->assertOk();
+    $this->get(route('blog.show', $post->slug))->assertOk();
+
+    expect($post->fresh()->views)->toBe(2)
+        ->and($post->fresh()->updated_at->equalTo($updatedAt))->toBeTrue();
 });
 
 test('a verified author can create and publish an article with a cover photo', function () {

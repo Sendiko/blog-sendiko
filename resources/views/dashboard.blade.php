@@ -10,7 +10,7 @@
             </a>
         </div>
 
-        <section aria-label="Article statistics" class="grid gap-4 sm:grid-cols-3">
+        <section aria-label="Article statistics" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
                 <p class="text-sm font-medium text-zinc-500">Total articles</p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $totalPosts }}</p>
@@ -22,6 +22,10 @@
             <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
                 <p class="text-sm font-medium text-zinc-500">Drafts</p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $draftPosts }}</p>
+            </div>
+            <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                <p class="text-sm font-medium text-zinc-500">Article views</p>
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">{{ number_format($totalViews) }}</p>
             </div>
         </section>
 
@@ -53,7 +57,7 @@
                                 <h3 class="truncate font-medium text-zinc-900 dark:text-white">{{ $post->title }}</h3>
                                 <span class="rounded-full px-2 py-0.5 text-xs {{ $post->status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300' }}">{{ ucfirst($post->status) }}</span>
                             </div>
-                            <p class="mt-1 text-sm text-zinc-500">Updated {{ $post->updated_at->diffForHumans() }}</p>
+                            <p class="mt-1 text-sm text-zinc-500">Updated {{ $post->updated_at->diffForHumans() }} · {{ number_format($post->views) }} {{ \Illuminate\Support\Str::plural('view', $post->views) }}</p>
                         </div>
                         <a href="{{ route('dashboard.posts.edit', $post) }}" class="text-sm font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white">Edit</a>
                     </article>

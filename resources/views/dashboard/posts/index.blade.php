@@ -25,7 +25,7 @@
                             </span>
                         </div>
                         <p class="mt-1 text-sm text-zinc-500">
-                            Updated {{ $post->updated_at->diffForHumans() }}
+                            Updated {{ $post->updated_at->diffForHumans() }} · {{ number_format($post->views) }} {{ \Illuminate\Support\Str::plural('view', $post->views) }}
                             @if ($post->status === 'published')
                                 · <a class="underline underline-offset-2 hover:text-zinc-900 dark:hover:text-white" href="{{ route('blog.show', $post->slug) }}" target="_blank">View article</a>
                             @endif
