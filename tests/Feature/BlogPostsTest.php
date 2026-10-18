@@ -81,8 +81,19 @@ test('verified authors can open the markdown editor', function () {
         ->get(route('dashboard.posts.create'))
         ->assertOk()
         ->assertSee('Markdown supported')
+        ->assertSee('Preview')
+        ->assertSee('min-h-[32rem]', false)
         ->assertSee('Upload photo')
         ->assertSee('data-article-form', false);
+});
+
+test('authors can preview safe rendered markdown', function () {
+    $this->actingAs(User::factory()->create())
+        ->postJson(route('dashboard.posts.preview'), [
+            'body' => "## Preview\n\n<script>alert('xss')</script>\n\n[unsafe](javascript:alert(1))",
+        ])
+        ->assertOk()
+        ->assertJsonPath('html', "<h2>Preview</h2>\n&lt;script&gt;alert('xss')&lt;/script&gt;\n<p><a>unsafe</a></p>\n");
 });
 
 test('an author can upload an inline image for a markdown article', function () {

@@ -45,7 +45,12 @@ class Post extends Model
 
     public function renderedBody(): string
     {
-        return Str::markdown($this->body, [
+        return self::renderMarkdown($this->body);
+    }
+
+    public static function renderMarkdown(string $body): string
+    {
+        return Str::markdown($body, [
             'html_input' => 'escape',
             'allow_unsafe_links' => false,
         ]);

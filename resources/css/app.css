@@ -61,6 +61,65 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+.markdown-preview > [data-preview-content] {
+    @apply max-w-none space-y-5 leading-7;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
+    @apply mt-8 font-semibold tracking-tight text-zinc-900 dark:text-white;
+}
+
+.markdown-preview h1 {
+    @apply text-3xl;
+}
+
+.markdown-preview h2 {
+    @apply text-2xl;
+}
+
+.markdown-preview h3 {
+    @apply text-xl;
+}
+
+.markdown-preview p {
+    @apply whitespace-pre-wrap;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+    @apply ml-6 list-outside space-y-2;
+}
+
+.markdown-preview ul {
+    @apply list-disc;
+}
+
+.markdown-preview ol {
+    @apply list-decimal;
+}
+
+.markdown-preview blockquote {
+    @apply border-l-4 border-zinc-300 pl-4 italic text-zinc-600 dark:border-zinc-600 dark:text-zinc-300;
+}
+
+.markdown-preview a {
+    @apply text-blue-700 underline underline-offset-4 dark:text-blue-300;
+}
+
+.markdown-preview :not(pre) > code {
+    @apply rounded bg-zinc-100 px-1.5 py-0.5 text-sm dark:bg-zinc-800;
+}
+
+.markdown-preview pre {
+    @apply overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm dark:bg-zinc-800;
+}
+
+.markdown-preview img {
+    @apply h-auto max-w-full rounded-lg;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

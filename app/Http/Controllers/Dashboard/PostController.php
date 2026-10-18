@@ -118,6 +118,17 @@ class PostController extends Controller
         ]);
     }
 
+    public function previewMarkdown(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'body' => ['nullable', 'string', 'max:50000'],
+        ]);
+
+        return response()->json([
+            'html' => Post::renderMarkdown($validated['body'] ?? ''),
+        ]);
+    }
+
     /**
      * @return array<string, array<int, string|Unique>>
      */
