@@ -74,6 +74,7 @@
                 <p class="text-xs text-zinc-500">Use the upload button to insert an image into your article. Maximum image size: 5 MB.</p>
                 <div data-editor-pane="write">
                     <textarea id="body" name="body" rows="32" required maxlength="50000" placeholder="# Your story starts here&#10;&#10;Write in Markdown: **bold**, *italic*, [links](https://example.com), and more." class="min-h-[32rem] w-full resize-y rounded-lg border border-zinc-300 bg-white px-5 py-4 font-mono text-sm leading-7 text-zinc-900 outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:ring-zinc-700">{{ old('body', $post->body) }}</textarea>
+                    <p data-character-count class="mt-2 text-right text-xs text-zinc-500" aria-live="polite"></p>
                 </div>
                 <section id="markdown-preview" data-editor-pane="preview" role="tabpanel" aria-labelledby="preview-tab" aria-live="polite" hidden class="markdown-preview min-h-[32rem] rounded-lg border border-zinc-300 bg-white px-5 py-4 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
                     <p data-preview-placeholder class="text-sm text-zinc-500">Your formatted article preview will appear here.</p>

@@ -9,6 +9,7 @@ const initializeArticleEditor = () => {
     const imageInput = form.querySelector('[data-inline-image]');
     const uploadButton = form.querySelector('[data-image-upload]');
     const body = form.querySelector('#body');
+    const characterCount = form.querySelector('[data-character-count]');
     const status = form.querySelector('[data-upload-status]');
     const editorTabs = form.querySelectorAll('[data-editor-tab]');
     const editorPanes = form.querySelectorAll('[data-editor-pane]');
@@ -19,6 +20,12 @@ const initializeArticleEditor = () => {
     let previewTimer;
 
     uploadButton.addEventListener('click', () => imageInput.click());
+
+    const updateCharacterCount = () => {
+        characterCount.textContent = `${body.value.length.toLocaleString()} / ${body.maxLength.toLocaleString()} characters`;
+    };
+
+    updateCharacterCount();
 
     const updatePreview = async () => {
         previewController?.abort();
@@ -93,6 +100,8 @@ const initializeArticleEditor = () => {
     });
 
     body.addEventListener('input', () => {
+        updateCharacterCount();
+
         if (form.querySelector('[data-editor-tab][aria-selected="true"]')?.dataset.editorTab !== 'preview') {
             return;
         }
@@ -138,6 +147,7 @@ const initializeArticleEditor = () => {
             const suffix = end < body.value.length && body.value[end] !== '\n' ? '\n\n' : '';
 
             body.setRangeText(`${prefix}${markdown}${suffix}`, start, end, 'end');
+            updateCharacterCount();
             body.focus();
             status.textContent = 'Photo uploaded and added to your article.';
         } catch (error) {

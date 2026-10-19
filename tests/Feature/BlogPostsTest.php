@@ -102,6 +102,8 @@ test('verified authors can open the markdown editor', function () {
         ->assertSee('Markdown supported')
         ->assertSee('Preview')
         ->assertSee('min-h-[32rem]', false)
+        ->assertSee('data-character-count', false)
+        ->assertSee('maxlength="50000"', false)
         ->assertSee('Upload photo')
         ->assertSee('data-article-form', false);
 });
